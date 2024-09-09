@@ -1,0 +1,29 @@
+class ItemListPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Lista de Items')),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance.collection('items').snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          return ListView(
+            children: snapshot.data!.docs.map((doc) {
+              return ListTile(
+                title: Text(doc['name']),
+                subtitle: Text(doc['created_at'].toDate().toString()),
+              );
+            }).toList(),
+          );
+        },
+      ),
+    );
+  }
+}

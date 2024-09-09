@@ -1,0 +1,57 @@
+class UpdateItemPage extends StatefulWidget {
+  final String itemId;
+  final String initialName;
+
+  UpdateItemPage({required this.itemId, required this.initialName});
+
+  @override
+  _UpdateItemPageState createState() => _UpdateItemPageState();
+}
+
+class _UpdateItemPageState extends State<UpdateItemPage> {
+  late TextEditingController _nameController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.initialName);
+  }
+
+  Future<void> _updateItem() async {
+    final String name = _nameController.text;
+
+    if (name.isNotEmpty) {
+      await FirebaseFirestore.instance
+          .collection('items')
+          .doc(widget.itemId)
+          .update({'name': name});
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Item actualizado'),
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Actualizar Item')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Nombre del item'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _updateItem,
+              child: Text('Actualizar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

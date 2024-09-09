@@ -1,0 +1,49 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+class CreateItemPage extends StatefulWidget {
+  @override
+  _CreateItemPageState createState() => _CreateItemPageState();
+}
+
+class _CreateItemPageState extends State<CreateItemPage> {
+  final TextEditingController _nameController = TextEditingController();
+
+  Future<void> _createItem() async {
+    final String name = _nameController.text;
+
+    if (name.isNotEmpty) {
+      await FirebaseFirestore.instance.collection('items').add({
+        'name': name,
+        'created_at': Timestamp.now(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Item creado'),
+      ));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Crear Item')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(labelText: 'Nombre del item'),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _createItem,
+              child: Text('Crear'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
